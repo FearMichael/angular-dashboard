@@ -1,1 +1,17 @@
-<p>table works!</p>
+<section>
+    <div class="d-flex justify-content-end pb-4">
+        <button mat-raised-button color='primary' [matMenuTriggerFor]="exportMenu">Export</button>
+        <mat-menu #exportMenu="matMenu">
+            <button mat-menu-item>PDF</button>
+            <button mat-menu-item>Excel</button>
+        </mat-menu>
+    </div>
+    <table>
+        <tr>
+            <th *ngFor="let header of headers">{{ header.text }}</th>
+        </tr>
+        <tr *ngFor="let row of data">
+            <td *ngFor="let header of headers">{{ row[header.value] }}</td>
+        </tr>
+    </table>
+</section>

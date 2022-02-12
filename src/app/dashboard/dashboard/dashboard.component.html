@@ -1,1 +1,7 @@
-<p>dashboard works!</p>
+<h1 class="pb-2">The Dashboard</h1>
+<h2>Summary</h2>
+<p>
+    <span>Budget Totals: {{ totalBudget | currency }}</span>
+    <!-- <span>{{ totalBudget }}</span> -->
+</p>
+<app-table [data]="tableData" [headers]="tableHeaders"></app-table>
