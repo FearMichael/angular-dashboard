@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ITableHeader } from 'src/app/interfaces/table.interfaces';
+import { ITableFilter, ITableHeader, ITableSort } from 'src/app/interfaces/table.interfaces';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,13 +12,13 @@ export class DashboardComponent implements OnInit {
     { value: "title", text: 'Title' },
     { value: "division", text: 'Division' },
     { value: "project_owner", text: 'Project Owner' },
-    { value: "budget", text: 'Budget' },
+    { value: "budget", text: 'Budget', format: 'currency' },
     { value: "status", text: 'Status' },
-    { value: "created", text: 'Created' },
-    { value: "modified", text: 'Modified' },
+    { value: "created", text: 'Created', format: 'date' },
+    { value: "modified", text: 'Modified', format: 'date' },
   ];
 
-  public tableData = [{
+  private _tableData = [{
     "title": "Tagtune",
     "division": "Accounting",
     "project_owner": "Kevin Snyder",
@@ -260,23 +260,57 @@ export class DashboardComponent implements OnInit {
     "modified": "10/01/2015"
   }];
 
+  public filteredTable = this.filterTable({});
+
+  public filter: Record<string, string | number> = {};
+
   public get totalBudget(): number {
-    return this.tableData.reduce((prev, curr) => {
+    return this._tableData.reduce((prev, curr) => {
       const val = prev + (curr?.budget || 0);
       return val
     }, 0);
     // return reduced.toFixed(2);
   }
 
-  public get totalStatus(): Record<string, number> {
-    return this.tableData.reduce((prev, curr) => {
-      if (prev[curr.status]) prev[curr.status] += 1;
-      else prev[curr.status] = 1;
+  public get totalStatus(): { name: string, count: number }[] {
+    return this._tableData.reduce((prev, curr) => {
+      const found = prev.find((elem) => elem.name === curr.status);
+      if (found) found.count++;
+      else prev.push({ name: curr.status, count: 1 });
       return prev;
-    }, {} as Record<string, number>)
+    }, [] as { name: string, count: number }[])
   }
 
   constructor() { }
+
+  public filterTable(event: any) {
+    const filterKeys = Object.keys(event).filter((k) => !!event[k]);
+    return this._tableData.filter((data: Record<string, any>) => {
+      const shouldReturn = filterKeys.length ? filterKeys.some((k) => {
+        const val = event[k];
+        // if ()
+        console.log('instanceof', val instanceof Date)
+        if (val instanceof Date) return new Date(data[k]?.toString()).toISOString() === val.toISOString();
+        return data[k]?.toString()?.toLowerCase()?.includes(val.toString()?.toLowerCase());
+      }) : true;
+      return shouldReturn
+    })
+  }
+
+  public sortTable({ header, direction }: ITableSort) {
+    const headerValue = header.value;
+    if (direction === '') {
+      this.filteredTable = [...this._tableData];
+      return;
+    }
+    this.filteredTable = [...this._tableData].sort((a: any, b: any) => {
+      let val = 0;
+      const multiplier = direction === 'DESC' ? -1 : 1;
+      if (a[headerValue] > b[headerValue]) val = 1;
+      else if (b[headerValue] > a[headerValue]) val = -1;
+      return val * multiplier;
+    })
+  }
 
   ngOnInit(): void {
   }

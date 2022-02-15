@@ -1,7 +1,9 @@
 <h1 class="pb-2">The Dashboard</h1>
 <h2>Summary</h2>
-<p>
-    <span>Budget Totals: {{ totalBudget | currency }}</span>
-    <!-- <span>{{ totalBudget }}</span> -->
-</p>
-<app-table [data]="tableData" [headers]="tableHeaders"></app-table>
+<div class="d-flex justify-content-evenly">
+    <p>
+        <span>Budget Totals: {{ totalBudget | currency }}</span>
+    </p>
+    <p *ngFor="let status of totalStatus">{{ status.name | titlecase}}: {{ status.count }}</p>
+</div>
+<app-table [data]="filteredTable" [headers]="tableHeaders" (filter)="filteredTable = filterTable($event)" (sort)="sortTable($event)"></app-table>

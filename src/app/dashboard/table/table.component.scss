@@ -1,3 +1,6 @@
+div.table-wrapper {
+    overflow-x: auto;
+}
 table {
     width: 100%;
     td, th {
@@ -6,6 +9,7 @@ table {
     th {
         font-weight: bold;
         font-size: 1.2em;
+        cursor: pointer;
     }
     tr {
       &:nth-child(even):not(:first-child) {
