@@ -8,18 +8,34 @@
     </div>
     <div class="table-wrapper">
         <table>
-            <tr [formGroup]="filterForm">
+            <tr>
                 <td *ngFor="let header of headers">
-                    <mat-form-field>
-                        <mat-label>{{ header.text }}</mat-label>
-                        <input matInput type="text" [formControlName]="header.value" *ngIf="header.format !== 'date'; else datePicker" />
-                        <ng-template #datePicker>
-                            <input matInput [matDatepicker]="picker" [formControlName]="header.value">
-                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                            <mat-datepicker #picker></mat-datepicker>
-                        </ng-template>
-                    </mat-form-field>
+                    <div [formGroup]="filterForm" *ngIf="header.format !== 'date'; else datePicker">
+                        <mat-form-field>
+                            <mat-label>{{ header.text }}</mat-label>
+                            <input matInput type="text" [formControlName]="header.value" />
+                        </mat-form-field>
+                    </div>
+                    <ng-template #datePicker>
+                        <div [formGroup]="dateFilterForm">
+                            <div [formGroupName]="header.value">
+                                <mat-form-field>
+                                    <mat-label>Start Date</mat-label>
+                                    <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+                                    <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                                    <mat-datepicker #startPicker></mat-datepicker>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>End Date</mat-label>
+                                    <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+                                    <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                                    <mat-datepicker #endPicker></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </ng-template>
                 </td>
+                <td *ngIf="!disableActions"></td>
             </tr>
             <tr>
                 <th *ngFor="let header of headers">
@@ -29,14 +45,43 @@
                         <mat-icon *ngIf="sortData?.direction === 'ASC' && sortData?.header?.value === header?.value">expand_less</mat-icon>
                     </div>
                 </th>
+                <th *ngIf="!disableActions">
+                    Actions
+                </th>
             </tr>
-            <tr *ngFor="let row of data">
+            <tr *ngFor="let row of data; let i = index">
                 <td *ngFor="let header of headers">
-                    <ng-container [ngSwitch]="header.format">
-                        <ng-container *ngSwitchCase="'date'">{{ row[header.value] | date }}</ng-container>
-                        <ng-container *ngSwitchCase="'currency'">{{ row[header.value] | currency }}</ng-container>
-                        <ng-container *ngSwitchDefault>{{ row[header.value] }}</ng-container>
+                    <ng-container *ngIf="editingItem === i && header.editable; else dataLayout">
+                        <mat-form-field *ngIf="header.format === 'date'; else defaultInput">
+                            <mat-label>{{ header.text }}</mat-label>
+                            <input matInput [matDatepicker]="datePicker" [value]="row[header.value]" (change)="rowUpdate(i, header.value, $event)">
+                            <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #datePicker></mat-datepicker>
+                        </mat-form-field>
+                        <ng-template #defaultInput>
+                            <mat-form-field>
+                                <mat-label>{{ header.text }}</mat-label>
+                                <input matInput [value]="row[header.value]" (change)="rowUpdate(row, header.value, $event)" />
+                            </mat-form-field>
+                        </ng-template>
                     </ng-container>
+                    <ng-template #dataLayout>
+                        <ng-container [ngSwitch]="header.format">
+                            <ng-container *ngSwitchCase="'date'">{{ row[header.value] | date }}</ng-container>
+                            <ng-container *ngSwitchCase="'currency'">{{ row[header.value] | currency }}</ng-container>
+                            <ng-container *ngSwitchDefault>{{ row[header.value] }}</ng-container>
+                        </ng-container>
+                    </ng-template>
+                </td>
+                <td *ngIf="!disableActions">
+                    <button mat-icon-button (click)="editingItem = null" *ngIf="editingItem === i; else editButton">
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                    <ng-template #editButton>
+                        <button mat-icon-button (click)="enableEdit(row, i)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </ng-template>
                 </td>
             </tr>
         </table>

@@ -9,6 +9,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+
 
 const modules = [
   MatToolbarModule,
@@ -19,7 +22,9 @@ const modules = [
   ReactiveFormsModule,
   MatDatepickerModule,
   MatNativeDateModule,
-  MatIconModule
+  MatIconModule,
+  FormsModule,
+  MatSnackBarModule
 ];
 
 @NgModule({
