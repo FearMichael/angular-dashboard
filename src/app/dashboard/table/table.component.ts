@@ -35,7 +35,6 @@ export class TableComponent<T extends { id: string | number }> implements OnInit
     this._config = val;
   }
   public get config(): ITableConfig {
-    console.log(this._config);
     return this._config;
   }
 
@@ -73,8 +72,8 @@ export class TableComponent<T extends { id: string | number }> implements OnInit
     });
     this.filterForm = new FormGroup(group);
     this.dateFilterForm = new FormGroup(dateGroup);
-    const filterSub = this.filterForm.valueChanges.subscribe((form) => this.filter.emit(form));
-    const dateFilterSub = this.dateFilterForm.valueChanges.subscribe((dateForm) => this.dateFilter.emit(dateForm));
+    const filterSub = this.filterForm.valueChanges.pipe(debounceTime(250), distinctUntilChanged()).subscribe((form) => this.filter.emit(form));
+    const dateFilterSub = this.dateFilterForm.valueChanges.pipe(debounceTime(250), distinctUntilChanged()).subscribe((dateForm) => this.dateFilter.emit(dateForm));
     this.subscriptions.push(filterSub, dateFilterSub);
   }
 

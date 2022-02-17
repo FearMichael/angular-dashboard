@@ -26,10 +26,10 @@ export class DashboardComponent implements OnInit {
 
   private _tableData: IDashboardTableData[] = mockData.map((e, i) => ({ id: i, ...e }));
   public get tableData() {
-    const sorted = this.sortTable(this._tableData);
-    const filtered = this.filterTable(sorted);
+    const filtered = this.filterTable(this._tableData);
     const dateFiltered = this.dateFilterTable(filtered);
-    return dateFiltered;
+    const sorted = this.sortTable(dateFiltered);
+    return sorted;
   }
 
   public get summaryData(): IDashboardSummaryData[] {
@@ -126,6 +126,7 @@ export class DashboardComponent implements OnInit {
   }
 
   public sortTable(data: IDashboardTableData[]) {
+    console.log(this.sort);
     if (!this.sort) return data;
     const { header, direction } = this.sort;
     const headerValue = header.value;
