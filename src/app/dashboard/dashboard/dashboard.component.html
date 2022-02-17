@@ -1,10 +1,9 @@
-<h1 class="pb-2">The Dashboard</h1>
+<h1 class="pb-2">The Project Dashboard</h1>
 <h2>Summary</h2>
-<!-- <app-table [data]="summaryData" [headers]="summaryHeaders" [disableActions]="true"></app-table> -->
-<div class="d-flex justify-content-evenly">
-    <p>
-        <span>Budget Totals: {{ totalBudget | currency }}</span>
-    </p>
-    <p *ngFor="let status of totalStatus">{{ status.name | titlecase}}: {{ status.count }}</p>
+<mat-divider class="my-2" color="primary"></mat-divider>
+<div class="mb-5">
+    <app-table [data]="summaryData" [headers]="summaryHeaders" [config]="{ disableActions: true, disableExport: true, disableFilters: true }"></app-table>
 </div>
-<app-table [data]="tableData" [headers]="tableHeaders" (dateFilter)="tableDateFilter = $event" (filter)="tableFilter = $event" (sort)="sort = $event" (recordChange)="updateData($event)"></app-table>
+<h2>Project Records</h2>
+<mat-divider class="my-2" color="primary"></mat-divider>
+<app-table [data]="tableData" [config]="{ linkRoute: 'projects' }" [headers]="tableHeaders" (dateFilter)="tableDateFilter = $event" (filter)="tableFilter = $event" (sort)="sort = $event" (recordChange)="updateData($event)"></app-table>

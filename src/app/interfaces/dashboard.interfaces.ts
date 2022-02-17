@@ -8,3 +8,11 @@ export interface IDashboardTableData {
     created: string;
     modified: string | null;
 }
+
+export interface IDashboardSummaryData {
+    id: number;
+    budget: number;
+    status: string;
+    highBudget: string;
+    lowBudget: string;
+}

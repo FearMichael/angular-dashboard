@@ -1,5 +1,7 @@
 <section>
-    <div class="d-flex justify-content-end pb-4">
+    <div class="d-flex justify-content-end pb-4" *ngIf="!config?.disableExport">
+
+        <button mat-raised-button color='primary' class="me-2">Add Record <mat-icon>add</mat-icon></button>
         <button mat-raised-button color='primary' [matMenuTriggerFor]="exportMenu">Export</button>
         <mat-menu #exportMenu="matMenu">
             <button mat-menu-item>PDF</button>
@@ -8,7 +10,7 @@
     </div>
     <div class="table-wrapper">
         <table>
-            <tr>
+            <tr *ngIf="!config?.disableFilters">
                 <td *ngFor="let header of headers">
                     <div [formGroup]="filterForm" *ngIf="header.format !== 'date'; else datePicker">
                         <mat-form-field>
@@ -35,7 +37,7 @@
                         </div>
                     </ng-template>
                 </td>
-                <td *ngIf="!disableActions"></td>
+                <td *ngIf="!config?.disableActions"></td>
             </tr>
             <tr>
                 <th *ngFor="let header of headers">
@@ -45,43 +47,56 @@
                         <mat-icon *ngIf="sortData?.direction === 'ASC' && sortData?.header?.value === header?.value">expand_less</mat-icon>
                     </div>
                 </th>
-                <th *ngIf="!disableActions">
+                <th *ngIf="!config?.disableActions">
                     Actions
                 </th>
             </tr>
             <tr *ngFor="let row of data; let i = index">
                 <td *ngFor="let header of headers">
-                    <ng-container *ngIf="editingItem === i && header.editable; else dataLayout">
+                    <ng-container *ngIf="editingItem?.id === row['id'] && header.editable; else dataLayout">
                         <mat-form-field *ngIf="header.format === 'date'; else defaultInput">
                             <mat-label>{{ header.text }}</mat-label>
-                            <input matInput [matDatepicker]="datePicker" [value]="row[header.value]" (change)="rowUpdate(i, header.value, $event)">
+                            <input matInput [matDatepicker]="datePicker" [value]="row[header.value]">
                             <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
                             <mat-datepicker #datePicker></mat-datepicker>
                         </mat-form-field>
                         <ng-template #defaultInput>
                             <mat-form-field>
                                 <mat-label>{{ header.text }}</mat-label>
-                                <input matInput [value]="row[header.value]" (change)="rowUpdate(row, header.value, $event)" />
+                                <input [type]="header.format === 'currency' ? 'number' : 'text'" matInput [(ngModel)]="editingItem[header.value]" />
                             </mat-form-field>
                         </ng-template>
                     </ng-container>
                     <ng-template #dataLayout>
                         <ng-container [ngSwitch]="header.format">
-                            <ng-container *ngSwitchCase="'date'">{{ row[header.value] | date }}</ng-container>
-                            <ng-container *ngSwitchCase="'currency'">{{ row[header.value] | currency }}</ng-container>
-                            <ng-container *ngSwitchDefault>{{ row[header.value] }}</ng-container>
+                            <!-- Compiler unable to determine value assertion here so cast as any -->
+                            <ng-container *ngSwitchCase="'date'">{{ $any(row[header.value]) | date }}</ng-container>
+                            <ng-container *ngSwitchCase="'currency'">{{ $any(row[header.value]) | currency }}</ng-container>
+                            <ng-container *ngSwitchDefault>
+                                <a [routerLink]="[config?.linkRoute, row.id]" *ngIf="header.route; else defaultText">{{ row[header.value] }}</a>
+                                <ng-template #defaultText>
+                                    {{ row[header.value] }}
+                                </ng-template>
+                            </ng-container>
                         </ng-container>
                     </ng-template>
                 </td>
-                <td *ngIf="!disableActions">
-                    <button mat-icon-button (click)="editingItem = null" *ngIf="editingItem === i; else editButton">
-                        <mat-icon>cancel</mat-icon>
-                    </button>
-                    <ng-template #editButton>
-                        <button mat-icon-button (click)="enableEdit(row, i)">
-                            <mat-icon>edit</mat-icon>
-                        </button>
-                    </ng-template>
+                <td *ngIf="!config?.disableActions">
+                    <div class="d-flex">
+                        <ng-container *ngIf="editingItem?.id === row['id']; else editButton">
+                            <button mat-icon-button (click)="rowUpdate()">
+                                <mat-icon>check</mat-icon>
+                            </button>
+                            <button mat-icon-button (click)="resetEdit()">
+                                <mat-icon>clear</mat-icon>
+                            </button>
+                        </ng-container>
+                        <ng-template #editButton>
+                            <button mat-icon-button (click)="enableEdit(row)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                        </ng-template>
+                    </div>
                 </td>
             </tr>
         </table>

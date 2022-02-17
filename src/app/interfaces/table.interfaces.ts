@@ -1,16 +1,19 @@
-export interface ITableHeader {
+type StringKeys<K> = Extract<keyof K, string>;
+
+export interface ITableHeader<T> {
     text: string;
-    value: string;
+    value: StringKeys<T>;
     format?: 'date' | 'currency'
     editable?: boolean;
+    route?: boolean;
 }
 
 export interface ITableFilter {
     [key: string]: string | number
 };
 
-export interface ITableSort {
-    header: ITableHeader;
+export interface ITableSort<T> {
+    header: ITableHeader<T>;
     direction: 'ASC' | 'DESC' | ''
 };
 
@@ -24,3 +27,10 @@ export interface IDateFilterEvent {
         endDate: Date
     }
 };
+
+export interface ITableConfig {
+    disableActions?: boolean;
+    disableFilters?: boolean;
+    disableExport?: boolean;
+    linkRoute?: string;
+}

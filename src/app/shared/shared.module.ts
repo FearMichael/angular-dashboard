@@ -11,6 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDividerModule } from '@angular/material/divider';
 
 
 const modules = [
@@ -24,7 +25,8 @@ const modules = [
   MatNativeDateModule,
   MatIconModule,
   FormsModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatDividerModule
 ];
 
 @NgModule({
