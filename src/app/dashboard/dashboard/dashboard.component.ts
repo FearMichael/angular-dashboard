@@ -126,7 +126,6 @@ export class DashboardComponent implements OnInit {
   }
 
   public sortTable(data: IDashboardTableData[]) {
-    console.log(this.sort);
     if (!this.sort) return data;
     const { header, direction } = this.sort;
     const headerValue = header.value;
